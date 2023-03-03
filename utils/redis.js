@@ -1,7 +1,7 @@
 const redis = require('redis');
 const { promisify } = require('util');
 
-const RedisClient = class {
+class RedisClient {
   constructor() {
     this.client = redis.createClient();
     this.isConnected = true;
@@ -30,7 +30,7 @@ const RedisClient = class {
   async del(key) {
     await promisify(this.client.DEL).bind(this.client)(key);
   }
-};
+}
 
 const redisClient = new RedisClient();
 export default redisClient;

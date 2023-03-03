@@ -25,6 +25,10 @@ class UsersController {
     const user = await dbClient.db.collection('users').insertOne({ email, password: hash });
     res.status(201).send({ id: `${user.insertedId}`, email: `${email}` });
   }
+
+  static getMe(req, res) {
+    res.send({ status: 'Me' });
+  }
 }
 
 export default UsersController;
