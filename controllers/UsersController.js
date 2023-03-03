@@ -1,7 +1,6 @@
 // import redisClient from '../utils/redis';
+import crypto from 'crypto';
 import dbClient from '../utils/db';
-
-const crypto = require('crypto');
 
 class UsersController {
   static async postNew(req, res) {
