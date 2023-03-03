@@ -1,5 +1,4 @@
 const express = require('express');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const bodyParser = require('body-parser');
 const indexRoutes = require('./routes/index');
 
