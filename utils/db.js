@@ -14,6 +14,7 @@ class DBClient {
     });
     this.client.connect((err) => {
       if (err) console.error(err);
+      this.db = this.client.db;
       this.isClientConnected = true;
     });
   }

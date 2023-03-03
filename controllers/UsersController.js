@@ -14,7 +14,7 @@ class UsersController {
       res.status(400).send({ error: 'Missing password' });
       return;
     }
-    const user = await dbClient.find({});
+    const user = await dbClient.db;
     console.log(user);
     if (email) {
       res.status(400).send({ error: 'Already exist' });
