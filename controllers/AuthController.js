@@ -27,7 +27,25 @@ class AuthController {
   }
 
   static async getDisconnect(req, res) {
-    res.send({ status: 'Disconnected' });
+    try {
+      const authToken = req.header('Authorization').split(' ')[1];
+      const auth = Buffer.from(authToken, 'base64').toString('utf8');
+      const [email, password] = auth.split(':');
+      console.log(email, password);
+      const hash = crypto.createHash('sha1').update(password).digest('hex');
+      const user = await dbClient.db.collection('users').findOne({ email, password: hash });
+      if (!user) {
+        res.status(401).send({ error: 'Unauthorized' });
+        return;
+      }
+      const token = uuidv4();
+      const key = `auth_${token}`;
+      redisClient.del(key);
+
+      res.status(204).send({});
+    } catch (error) {
+      res.status(401).send({ error: 'Unauthorized' });
+    }
   }
 }
 
