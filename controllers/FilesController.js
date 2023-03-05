@@ -20,7 +20,7 @@ class FilesController {
       return;
     }
     const {
-      name, type, parentId = 0, isPublic = false, data,
+      name, type, parentId, isPublic, data,
     } = req.body;
 
     if (!name) {
@@ -39,18 +39,18 @@ class FilesController {
     }
 
     if (parentId) {
-      const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(parentId) });
-      if (!file) {
+      const parent = await dbClient.db.collection('files').findOne({ _id: ObjectId(parentId) });
+      if (!parent) {
         res.status(400).send({ error: 'Parent not found' });
         return;
       }
-      if (file.type !== 'folder') {
+      if (parent.type !== 'folder') {
         res.status(400).send({ error: 'Parent is not a folder' });
         return;
       }
     }
     const newFile = {
-      userId: user._id, name, type, isPublic, parentId,
+      userId: user._id.toString(), name, type, isPublic: isPublic || false, parentId: parentId || 0,
     };
     if (type === 'folder') {
       const file = await dbClient.db.collection('files').insertOne(newFile);
@@ -70,7 +70,7 @@ class FilesController {
       writeFileSync(filePath, decodedData, 'utf8');
       newFile.localPath = filePath;
       await dbClient.db.collection('files').insertOne(newFile);
-      newFile.id = newFile._id;
+      newFile.id = newFile.insertedId;
       delete newFile._id;
       delete newFile.localPath;
       res.status(201).send(newFile);
@@ -115,8 +115,8 @@ class FilesController {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    const parentId = req.query.parentId || 0;
-    const files = await dbClient.db.collection('files').find({ parentId });
+    // const { parentId, page } = req.query;
+    const files = await dbClient.db.collection('files').aggregate({ userId: user._id.toString() });
     if (!files) {
       res.status(200).send([]);
       return;
