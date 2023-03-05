@@ -101,7 +101,7 @@ class FilesController {
     file.id = file._id;
     delete file._id;
     delete file.localPath;
-    res.status(200).send(file);
+    res.status(201).send(file);
   }
 
   static async getIndex(req, res) {
