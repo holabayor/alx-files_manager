@@ -52,7 +52,7 @@ class FilesController {
       }
     }
     const newFile = {
-      userId: user._id, name, type, isPublic, parentId: ObjectId(parentId),
+      userId: user._id, name, type, isPublic, parentId,
     };
     if (type === 'folder') {
       const file = await dbClient.db.collection('files').insertOne(newFile);
