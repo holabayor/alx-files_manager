@@ -70,7 +70,7 @@ class FilesController {
       writeFileSync(filePath, decodedData, 'utf8');
       newFile.localPath = filePath;
       await dbClient.db.collection('files').insertOne(newFile);
-      newFile.id = newFile.insertedId;
+      newFile.id = newFile._id;
       delete newFile._id;
       delete newFile.localPath;
       res.status(201).send(newFile);
@@ -115,7 +115,7 @@ class FilesController {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    // const { parentId, page } = req.query;
+    const { parentId, page } = req.query;
     const files = await dbClient.db.collection('files').aggregate({ userId: user._id.toString() });
     if (!files) {
       res.status(200).send([]);
