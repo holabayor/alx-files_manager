@@ -9,9 +9,7 @@ class FilesController {
   static async postUpload(req, res) {
     const token = req.header('X-Token');
     const key = `auth_${token}`;
-    console.log(key);
     const userId = await redisClient.get(key);
-    console.log(userId);
     if (!userId) {
       res.status(401).send({ error: 'Unauthorized' });
       return;
@@ -112,6 +110,17 @@ class FilesController {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
+    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
+    if (!user) {
+      res.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+    const parentId = req.query.parentId || 0;
+    const files = await dbClient.db.collection('files').find({ parentId });
+    if (!files) {
+      res.status(200).send([]);
+      return;
+    }
     /* const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
 
     const file = await dbClient.db.collection('files').find({ parentId });
@@ -119,7 +128,8 @@ class FilesController {
       res.status(404).send({ error: 'Not found' });
       return;
     } */
-    res.status(200).send({});
+    // console.log(files);
+    res.status(200).send([files]);
   }
 }
 
