@@ -40,7 +40,6 @@ class FilesController {
       return;
     }
 
-    console.log(parentId !== 0);
     if (parentId) {
       const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(parentId) });
       if (!file) {
@@ -53,7 +52,7 @@ class FilesController {
       }
     }
     const newFile = {
-      userId: user._id, name, type, isPublic, parentId,
+      userId: user._id, name, type, isPublic, parentId: ObjectId(parentId),
     };
     if (type === 'folder') {
       const file = await dbClient.db.collection('files').insertOne(newFile);
