@@ -14,7 +14,8 @@ class FilesController {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
+    const user = await dbClient.db.collection('users')
+      .findOne({ _id: ObjectId(userId) });
     if (!user) {
       res.status(401).send({ error: 'Unauthorized' });
       return;
@@ -39,7 +40,8 @@ class FilesController {
     }
 
     if (parentId) {
-      const parent = await dbClient.db.collection('files').findOne({ _id: ObjectId(parentId) });
+      const parent = await dbClient.db.collection('files')
+        .findOne({ _id: ObjectId(parentId) });
       if (!parent) {
         res.status(400).send({ error: 'Parent not found' });
         return;
@@ -50,10 +52,15 @@ class FilesController {
       }
     }
     const newFile = {
-      userId: user._id.toString(), name, type, isPublic: isPublic || false, parentId: parentId || 0,
+      userId: ObjectId(user._id),
+      name,
+      type,
+      isPublic: isPublic || false,
+      parentId: parentId || 0,
     };
     if (type === 'folder') {
-      const file = await dbClient.db.collection('files').insertOne(newFile);
+      const file = await dbClient.db.collection('files')
+        .insertOne(newFile);
       newFile.id = file.insertedId;
       delete newFile._id;
       res.status(201).send(newFile);
@@ -110,26 +117,32 @@ class FilesController {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
+    const user = await dbClient.db.collection('users')
+      .findOne({ _id: ObjectId(userId) });
     if (!user) {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    const { parentId, page } = req.query;
-    const files = await dbClient.db.collection('files').aggregate({ userId: user._id.toString() });
+    const { parentId } = req.query.parentId || 0;
+    const { page } = req.query.page || 0;
+    const size = 2;
+    const files = await dbClient.db.collection('files')
+      .aggregate({ parentId })
+      .skip(page * size)
+      .limit(size)
+      .toArray();
     if (!files) {
       res.status(200).send([]);
       return;
     }
-    /* const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
 
-    const file = await dbClient.db.collection('files').find({ parentId });
-    if (!file) {
-      res.status(404).send({ error: 'Not found' });
-      return;
-    } */
     // console.log(files);
-    res.status(200).send([files]);
+    files.map((file) => {
+      // eslint-disable-next-line no-param-reassign
+      delete file.localPath;
+      return file;
+    });
+    res.status(200).send(files);
   }
 }
 
