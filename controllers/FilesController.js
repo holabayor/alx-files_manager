@@ -125,9 +125,17 @@ class FilesController {
     }
     const { parentId } = req.query.parentId || 0;
     const { page } = req.query.page || 0;
-    const size = 2;
+    const size = 20;
+    let query;
+    if (!parentId) {
+      query = { userId: user._id };
+    } else {
+      query = { userId: user._id, parentId: ObjectId(parentId) };
+    }
     const files = await dbClient.db.collection('files')
-      .aggregate({ parentId })
+      .aggregate([
+        { $match: query },
+      ])
       .skip(page * size)
       .limit(size)
       .toArray();
