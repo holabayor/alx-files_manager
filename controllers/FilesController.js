@@ -56,7 +56,7 @@ class FilesController {
       name,
       type,
       isPublic: isPublic || false,
-      parentId: parentId || 0,
+      parentId: ObjectId(parentId) || 0,
     };
     if (type === 'folder') {
       const file = await dbClient.db.collection('files')
