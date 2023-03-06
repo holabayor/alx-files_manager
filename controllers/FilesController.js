@@ -41,7 +41,7 @@ class FilesController {
 
     if (parentId) {
       const parent = await dbClient.db.collection('files')
-        .findOne({ _id: ObjectId(parentId) });
+        .findOne({ _id: ObjectId(parentId), userId: user._id });
       if (!parent) {
         res.status(400).send({ error: 'Parent not found' });
         return;
