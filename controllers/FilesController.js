@@ -52,7 +52,7 @@ class FilesController {
       }
     }
     const newFile = {
-      userId: ObjectId(user._id),
+      userId: user._id.toString(),
       name,
       type,
       isPublic: isPublic || false,
