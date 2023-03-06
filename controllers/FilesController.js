@@ -95,9 +95,11 @@ class FilesController {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
+    const user = await dbClient.db.collection('users')
+      .findOne({ _id: ObjectId(userId) });
 
-    const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(id), userId: user._id });
+    const file = await dbClient.db.collection('files')
+      .findOne({ _id: ObjectId(id), userId: user._id });
     if (!file) {
       res.status(404).send({ error: 'Not found' });
       return;
@@ -105,7 +107,7 @@ class FilesController {
     file.id = file._id;
     delete file._id;
     delete file.localPath;
-    res.status(201).send(file);
+    res.status(200).send(file);
   }
 
   static async getIndex(req, res) {
