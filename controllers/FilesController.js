@@ -76,8 +76,8 @@ class FilesController {
       const decodedData = Buffer.from(data, 'base64');
       writeFileSync(filePath, decodedData, 'utf8');
       newFile.localPath = filePath;
-      const file = await dbClient.db.collection('files').insertOne(newFile);
-      newFile.id = file.insertedId;
+      await dbClient.db.collection('files').insertOne(newFile);
+      newFile.id = newFile._id;
       delete newFile._id;
       delete newFile.localPath;
       res.status(201).send(newFile);
