@@ -88,9 +88,9 @@ class FilesController {
     const { id } = req.params;
     const token = req.header('X-Token');
     const key = `auth_${token}`;
-    console.log(key);
+
     const userId = await redisClient.get(key);
-    console.log(userId);
+
     if (!userId) {
       res.status(401).send({ error: 'Unauthorized' });
       return;
@@ -100,14 +100,21 @@ class FilesController {
 
     const file = await dbClient.db.collection('files')
       .findOne({ _id: ObjectId(id), userId: user._id });
+    console.log(file);
+    console.log(user);
     if (!file) {
       res.status(404).send({ error: 'Not found' });
       return;
     }
-    file.id = file._id;
-    delete file._id;
-    delete file.localPath;
-    res.status(200).send(file);
+    const result = {
+      id: file._id,
+      userId: file.userId,
+      name: file.name,
+      type: file.type,
+      isPublic: file.isPublic,
+      parentId: file.parentId,
+    };
+    res.status(200).send(result);
   }
 
   static async getIndex(req, res) {
