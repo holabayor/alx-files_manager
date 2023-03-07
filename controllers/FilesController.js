@@ -183,8 +183,14 @@ class FilesController {
       res.status(404).send({ error: 'Not found' });
       return;
     }
-    file.isPublic = true;
-    res.status(200).send(file);
+    const newFile = {
+      id: file._id,
+      ...file,
+    };
+    newFile.isPublic = true;
+    delete newFile._id;
+    delete newFile.localPath;
+    res.status(200).send(newFile);
   }
 
   static async putUnpublish(req, res) {
@@ -208,8 +214,14 @@ class FilesController {
       res.status(404).send({ error: 'Not found' });
       return;
     }
-    file.isPublic = false;
-    res.status(200).send(file);
+    const newFile = {
+      id: file._id,
+      ...file,
+    };
+    newFile.isPublic = false;
+    delete newFile._id;
+    delete newFile.localPath;
+    res.status(200).send(newFile);
   }
 }
 
