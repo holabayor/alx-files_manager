@@ -138,9 +138,9 @@ class FilesController {
     const size = 20;
     let query;
     if (!parentId) {
-      query = { userId: user._id };
+      query = { userId: user._id.toString() };
     } else {
-      query = { userId: user._id, parentId };
+      query = { userId: user._id.toString(), parentId };
     }
     const files = await dbClient.db.collection('files')
       .find({ query })
