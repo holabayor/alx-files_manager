@@ -103,8 +103,17 @@ class FilesController {
       .findOne({ _id: ObjectId(userId) });
 
     const file = await dbClient.db.collection('files')
-      .findOne({ _id: ObjectId(id), userId: user._id });
-    console.log(file);
+      .findOne({
+        _id: ObjectId(id),
+        userId: user._id,
+      });
+    console.log('The object id is ', ObjectId(id));
+    console.log('The user id is ', user._id);
+    console.log(await dbClient.db.collection('files')
+      .findOne({ _id: ObjectId(id) }));
+    console.log(await dbClient.db.collection('files')
+      .findOne({ userId: user._id }));
+    console.log('The file is ', file);
     console.log(user);
     if (!file) {
       res.status(404).send({ error: 'Not found' });
@@ -136,8 +145,8 @@ class FilesController {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    const { parentId } = req.query.parentId || 0;
-    const { page } = req.query.page;
+    const { parentId, page } = req.query;
+    console.log(parentId, page);
     const size = 20;
     let query;
     if (!parentId) {
@@ -181,7 +190,10 @@ class FilesController {
     }
     const { id } = req.params;
     const file = await dbClient.db.collection('files')
-      .findOne({ _id: ObjectId(id), userId: user._id });
+      .findOne({
+        _id: ObjectId(id),
+        userId: user._id,
+      });
     if (!file) {
       res.status(404).send({ error: 'Not found' });
       return;
@@ -212,7 +224,10 @@ class FilesController {
     }
     const { id } = req.params;
     const file = await dbClient.db.collection('files')
-      .findOne({ _id: ObjectId(id), userId: user._id });
+      .findOne({
+        _id: ObjectId(id),
+        userId: user._id,
+      });
     if (!file) {
       res.status(404).send({ error: 'Not found' });
       return;
