@@ -1,8 +1,11 @@
 /* eslint-disable no-param-reassign */
-import { existsSync, mkdir, writeFileSync } from 'fs';
+import {
+  existsSync, mkdir, writeFileSync,
+} from 'fs';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import mime from 'mime-types';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -240,19 +243,18 @@ class FilesController {
     }
     const { id } = req.params;
     const file = await dbClient.db.collection('files')
-      .findOne({ _id: ObjectId(id), userId: user._id });
-    if (!file) {
+      .findOne({ _id: ObjectId(id) });
+    if ((!file) || (!file.isPublic && !user)) {
       res.status(404).send({ error: 'Not found' });
       return;
     }
-    const newFile = {
-      id: file._id,
-      ...file,
-    };
-    newFile.isPublic = false;
-    delete newFile._id;
-    delete newFile.localPath;
-    res.status(200).send(newFile);
+
+    if (file.type === 'folder') {
+      res.status(404).send({ error: 'A folder doesn\'t have content' });
+      return;
+    }
+    res.set('Content-Type', mime.lookup(file.name));
+    res.status(200).sendFile(file.localPath);
   }
 }
 
