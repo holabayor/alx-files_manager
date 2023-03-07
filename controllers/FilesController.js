@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { existsSync, mkdir, writeFileSync } from 'fs';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
@@ -133,19 +134,17 @@ class FilesController {
       return;
     }
     const { parentId } = req.query.parentId || 0;
-    const { page } = req.query.page || 0;
+    const { page } = req.query.page;
     const size = 20;
     let query;
     if (!parentId) {
       query = { userId: user._id };
     } else {
-      query = { userId: user._id, parentId: ObjectId(parentId) };
+      query = { userId: user._id, parentId };
     }
     const files = await dbClient.db.collection('files')
-      .aggregate([
-        { $match: query },
-      ])
-      .skip(page * size)
+      .find({ query })
+      .skip((page - 1) * size)
       .limit(size)
       .toArray();
     if (!files) {
@@ -155,8 +154,9 @@ class FilesController {
 
     // console.log(files);
     files.map((file) => {
-      // eslint-disable-next-line no-param-reassign
+      file.id = file._id;
       delete file.localPath;
+      delete file._id;
       return file;
     });
     res.status(200).send(files);
