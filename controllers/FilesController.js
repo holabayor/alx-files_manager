@@ -145,7 +145,8 @@ class FilesController {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-    const { parentId, page } = req.query;
+    const { parentId, pageNum } = req.query;
+    const page = pageNum || 0;
     console.log(parentId, page);
     const size = 20;
     let query;
@@ -155,8 +156,8 @@ class FilesController {
       query = { userId: user._id.toString(), parentId };
     }
     const files = await dbClient.db.collection('files')
-      .find({ query })
-      .skip((page - 1) * size)
+      .aggregate({ query })
+      .skip(page * size)
       .limit(size)
       .toArray();
     if (!files) {
