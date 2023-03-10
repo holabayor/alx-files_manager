@@ -33,8 +33,8 @@ class FilesController {
       return;
     }
     const acceptedTypes = ['folder', 'file', 'image'];
-    if (!type && !acceptedTypes.includes(type)) {
-      res.status(400).send({ error: 'Missing data' });
+    if (!type || (!type && !acceptedTypes.includes(type))) {
+      res.status(400).send({ error: 'Missing type' });
       return;
     }
 
@@ -265,7 +265,7 @@ class FilesController {
     }
 
     if (file.type === 'folder') {
-      res.status(404).send({ error: 'A folder doesn\'t have content' });
+      res.status(400).send({ error: 'A folder doesn\'t have content' });
       return;
     }
     res.set('Content-Type', mime.lookup(file.name));
