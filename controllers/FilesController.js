@@ -247,16 +247,10 @@ class FilesController {
     const token = req.header('X-Token');
     const key = `auth_${token}`;
     const userId = await redisClient.get(key);
-    if (!userId) {
-      res.status(401).send({ error: 'Unauthorized' });
-      return;
-    }
+
     const user = await dbClient.db.collection('users')
       .findOne({ _id: ObjectId(userId) });
-    if (!user) {
-      res.status(401).send({ error: 'Unauthorized' });
-      return;
-    }
+
     const { id } = req.params;
     const file = await dbClient.db.collection('files')
       .findOne({ _id: ObjectId(id) });
