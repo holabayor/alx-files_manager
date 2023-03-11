@@ -254,7 +254,9 @@ class FilesController {
     const { id } = req.params;
     const file = await dbClient.db.collection('files')
       .findOne({ _id: ObjectId(id) });
-    if ((!file) || (!file.isPublic && !user)) {
+    if ((!file)
+    || (!file.isPublic && !user)
+    || (!existsSync(file.localPath))) {
       res.status(404).send({ error: 'Not found' });
       return;
     }
